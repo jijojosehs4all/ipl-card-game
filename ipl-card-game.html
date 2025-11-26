@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPL Top Trumps - Cricket Card Game</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-900 via-purple-900 to-pink-900 min-h-screen font-sans">
+    <div id="app" class="container mx-auto px-4 py-8">
+        <!-- Game Title -->
+        <div id="gameTitle" class="text-center mb-8">
+            <h1 class="text-5xl font-bold text-white mb-2">🏏 IPL Top Trumps</h1>
+            <p class="text-xl text-pink-200">The Ultimate Cricket Card Game</p>
+        </div>
+
+        <!-- Menu Screen -->
+        <div id="menuScreen" class="max-w-2xl mx-auto">
+            <div class="bg-white bg-opacity-10 backdrop-blur-md rounded-2xl p-8 border border-white border-opacity-20">
+                <h2 class="text-3xl font-bold text-white mb-6 text-center">How to Play</h2>
+
+                <div class="text-white space-y-4 mb-8">
+                    <div class="bg-pink-500 bg-opacity-20 p-4 rounded-lg">
+                        <h3 class="font-bold text-lg mb-2">🎮 The Rules</h3>
+                        <ol class="space-y-2 text-sm">
+                            <li><strong>1. Setup:</strong> All 54 cards are shuffled and dealt evenly (27 each)</li>
+                            <li><strong>2. Draw:</strong> Player 1 draws their top card and calls out a stat</li>
+                            <li><strong>3. Compare:</strong> Player 2 draws their top card. Highest value wins the round</li>
+                            <li><strong>4. Winner Takes:</strong> Winner takes both cards and puts them at the bottom of their pile</li>
+                            <li><strong>5. Tie:</strong> If stats are equal, each player keeps their own card</li>
+                            <li><strong>6. Win Condition:</strong> First player to collect all 54 cards wins!</li>
+                        </ol>
+                    </div>
+
+                    <div class="bg-blue-500 bg-opacity-20 p-4 rounded-lg">
+                        <h3 class="font-bold text-lg mb-2">📊 Card Stats</h3>
+                        <p class="text-sm">Each card shows 7 different stats you can choose from:</p>
+                        <div class="grid grid-cols-2 gap-2 mt-2 text-xs">
+                            <div>• Matches Played</div>
+                            <div>• Total Runs</div>
+                            <div>• Batting Average</div>
+                            <div>• Strike Rate</div>
+                            <div>• Highest Score</div>
+                            <div>• Centuries</div>
+                            <div>• Fifties</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-purple-500 bg-opacity-20 p-4 rounded-lg">
+                        <h3 class="font-bold text-lg mb-2">💡 Strategy Tip</h3>
+                        <p class="text-sm">Choose the stat you think will win based on the players' strengths. Aggressive batsmen might have higher strike rates, while consistent players might have better averages.</p>
+                    </div>
+                </div>
+
+                <button onclick="startGame()" class="w-full bg-gradient-to-r from-pink-500 to-blue-500 hover:from-pink-600 hover:to-blue-600 text-white font-bold py-4 px-6 rounded-lg text-lg transition transform hover:scale-105">
+                    🎮 Start Game
+                </button>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="gameScreen" class="hidden">
+            <!-- Game Status -->
+            <div class="mb-8">
+                <div class="grid grid-cols-2 gap-4 max-w-2xl mx-auto">
+                    <div class="bg-white bg-opacity-10 rounded-lg p-4 text-center border-2 border-pink-400">
+                        <div class="text-pink-300 text-sm font-semibold">Player 1 (You)</div>
+                        <div class="text-4xl font-bold text-white" id="p1Cards">27</div>
+                        <div class="text-xs text-pink-200">Cards Remaining</div>
+                    </div>
+                    <div class="bg-white bg-opacity-10 rounded-lg p-4 text-center border-2 border-blue-400">
+                        <div class="text-blue-300 text-sm font-semibold">Player 2 (AI)</div>
+                        <div class="text-4xl font-bold text-white" id="p2Cards">27</div>
+                        <div class="text-xs text-blue-200">Cards Remaining</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cards Display -->
+            <div class="mb-8">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                    <!-- Player 1 Card -->
+                    <div id="p1CardContainer" class="flex justify-center">
+                        <div id="p1Card" class="w-full max-w-xs h-96 rounded-2xl shadow-2xl cursor-pointer transform transition hover:scale-105" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <div class="p-6 h-full flex flex-col justify-between text-white">
+                                <div>
+                                    <div class="text-xs font-semibold opacity-75 mb-2">PLAYER 1</div>
+                                    <div class="text-sm font-bold" id="p1TeamName">Loading...</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-3xl font-bold mb-2" id="p1PlayerName">—</div>
+                                    <div class="text-xs opacity-75" id="p1Team">—</div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2 text-xs">
+                                    <div><strong id="p1Matches">—</strong><br><span class="opacity-75">Matches</span></div>
+                                    <div><strong id="p1Runs">—</strong><br><span class="opacity-75">Runs</span></div>
+                                    <div><strong id="p1Average">—</strong><br><span class="opacity-75">Avg</span></div>
+                                    <div><strong id="p1SR">—</strong><br><span class="opacity-75">SR</span></div>
+                                    <div><strong id="p1HS">—</strong><br><span class="opacity-75">HS</span></div>
+                                    <div><strong id="p1Centuries">—</strong><br><span class="opacity-75">100s</span></div>
+                                    <div><strong id="p1Fifties">—</strong><br><span class="opacity-75">50s</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Player 2 Card -->
+                    <div id="p2CardContainer" class="flex justify-center">
+                        <div id="p2Card" class="w-full max-w-xs h-96 rounded-2xl shadow-2xl" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                            <div class="p-6 h-full flex flex-col justify-between text-white">
+                                <div>
+                                    <div class="text-xs font-semibold opacity-75 mb-2">PLAYER 2</div>
+                                    <div class="text-sm font-bold" id="p2TeamName">?</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-3xl font-bold mb-2">?</div>
+                                    <div class="text-xs opacity-75">AI Opponent</div>
+                                </div>
+                                <div class="text-center text-sm opacity-75">
+                                    <p>Waiting...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stat Selection -->
+            <div id="statSelectionContainer" class="max-w-4xl mx-auto">
+                <div class="bg-white bg-opacity-10 rounded-xl p-6 border border-white border-opacity-20 mb-8">
+                    <h3 class="text-white font-bold text-lg mb-4 text-center">Choose a Stat to Call Out:</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <button onclick="playRound('matches')" class="stat-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition transform hover:scale-105">
+                            <div class="text-xs opacity-75">Matches</div>
+                            <div id="callMatches" class="font-bold">—</div>
+                        </button>
+                        <button onclick="playRound('runs')" class="stat-btn bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition transform hover:scale-105">
+                            <div class="text-xs opacity-75">Total Runs</div>
+                            <div id="callRuns" class="font-bold">—</div>
+                        </button>
+                        <button onclick="playRound('average')" class="stat-btn bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded-lg transition transform hover:scale-105">
+                            <div class="text-xs opacity-75">Average</div>
+                            <div id="callAverage" class="font-bold">—</div>
+                        </button>
+                        <button onclick="playRound('strikeRate')" class="stat-btn bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded-lg transition transform hover:scale-105">
+                            <div class="text-xs opacity-75">Strike Rate</div>
+                            <div id="callStrikeRate" class="font-bold">—</div>
+                        </button>
+                        <button onclick="playRound('highest')" class="stat-btn bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition transform hover:scale-105">
+                            <div class="text-xs opacity-75">Highest Score</div>
+                            <div id="callHighest" class="font-bold">—</div>
+                        </button>
+                        <button onclick="playRound('centuries')" class="stat-btn bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg transition transform hover:scale-105">
+                            <div class="text-xs opacity-75">Centuries</div>
+                            <div id="callCenturies" class="font-bold">—</div>
+                        </button>
+                        <button onclick="playRound('fifties')" class="stat-btn bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg transition transform hover:scale-105">
+                            <div class="text-xs opacity-75">Fifties</div>
+                            <div id="callFifties" class="font-bold">—</div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Round Result -->
+            <div id="roundResultContainer" class="hidden max-w-2xl mx-auto mb-8">
+                <div class="bg-white bg-opacity-10 rounded-xl p-6 border border-white border-opacity-20">
+                    <div class="text-center">
+                        <div id="roundMessage" class="text-2xl font-bold text-white mb-4">—</div>
+                        <div id="roundStats" class="text-white mb-6 space-y-2">—</div>
+                        <button onclick="nextRound()" class="bg-gradient-to-r from-pink-500 to-blue-500 hover:from-pink-600 hover:to-blue-600 text-white font-bold py-2 px-8 rounded-lg transition transform hover:scale-105">
+                            Next Round
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="gameOverScreen" class="hidden max-w-2xl mx-auto">
+            <div class="bg-white bg-opacity-10 backdrop-blur-md rounded-2xl p-8 border border-white border-opacity-20 text-center">
+                <h2 id="gameOverTitle" class="text-4xl font-bold text-white mb-4">🎉 Game Over!</h2>
+                <p id="gameOverMessage" class="text-2xl text-pink-200 mb-8">—</p>
+                <button onclick="location.reload()" class="bg-gradient-to-r from-pink-500 to-blue-500 hover:from-pink-600 hover:to-blue-600 text-white font-bold py-4 px-8 rounded-lg text-lg transition transform hover:scale-105">
+                    Play Again
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Player data - 54 current IPL batsmen
+        const players = [
+            // CSK (Chennai Super Kings) - 6
+            { name: "Ruturaj Gaikwad", team: "CSK", matches: 35, runs: 1850, average: 42.5, strikeRate: 132.4, highest: 98, centuries: 0, fifties: 12 },
+            { name: "Ambati Rayudu", team: "CSK", matches: 45, runs: 1680, average: 39.2, strikeRate: 128.6, highest: 89, centuries: 0, fifties: 11 },
+            { name: "Robin Uthappa", team: "CSK", matches: 42, runs: 1420, average: 36.8, strikeRate: 131.2, highest: 88, centuries: 0, fifties: 9 },
+            { name: "MS Dhoni", team: "CSK", matches: 50, runs: 1670, average: 41.8, strikeRate: 135.4, highest: 84, centuries: 0, fifties: 10 },
+            { name: "Shivam Dube", team: "CSK", matches: 38, runs: 1250, average: 35.6, strikeRate: 142.8, highest: 87, centuries: 0, fifties: 7 },
+            { name: "Deepak Chahar", team: "CSK", matches: 28, runs: 320, average: 20.0, strikeRate: 138.9, highest: 52, centuries: 0, fifties: 1 },
+
+            // MI (Mumbai Indians) - 6
+            { name: "Suryakumar Yadav", team: "MI", matches: 48, runs: 2080, average: 44.6, strikeRate: 145.3, highest: 96, centuries: 0, fifties: 14 },
+            { name: "Ishan Kishan", team: "MI", matches: 42, runs: 1520, average: 38.0, strikeRate: 141.2, highest: 93, centuries: 0, fifties: 10 },
+            { name: "Hardik Pandya", team: "MI", matches: 46, runs: 1340, average: 32.4, strikeRate: 148.9, highest: 91, centuries: 0, fifties: 8 },
+            { name: "Anmolpreet Singh", team: "MI", matches: 15, runs: 420, average: 30.0, strikeRate: 135.6, highest: 68, centuries: 0, fifties: 2 },
+            { name: "Dewald Brevis", team: "MI", matches: 12, runs: 310, average: 31.0, strikeRate: 136.8, highest: 55, centuries: 0, fifties: 1 },
+            { name: "Kieron Pollard", team: "MI", matches: 44, runs: 1220, average: 28.6, strikeRate: 155.1, highest: 83, centuries: 0, fifties: 5 },
+
+            // RCB (Royal Challengers Bangalore) - 6
+            { name: "Virat Kohli", team: "RCB", matches: 52, runs: 2200, average: 42.3, strikeRate: 131.6, highest: 92, centuries: 0, fifties: 16 },
+            { name: "Faf du Plessis", team: "RCB", matches: 40, runs: 1740, average: 43.5, strikeRate: 127.8, highest: 96, centuries: 0, fifties: 13 },
+            { name: "Glenn Maxwell", team: "RCB", matches: 36, runs: 1180, average: 32.8, strikeRate: 159.4, highest: 108, centuries: 1, fifties: 5 },
+            { name: "Rajat Patidar", team: "RCB", matches: 18, runs: 540, average: 36.0, strikeRate: 143.2, highest: 88, centuries: 0, fifties: 2 },
+            { name: "Will Jacks", team: "RCB", matches: 8, runs: 280, average: 35.0, strikeRate: 154.9, highest: 62, centuries: 0, fifties: 1 },
+            { name: "Dinesh Karthik", team: "RCB", matches: 35, runs: 890, average: 26.2, strikeRate: 146.7, highest: 71, centuries: 0, fifties: 4 },
+
+            // KKR (Kolkata Knight Riders) - 6
+            { name: "Shreyas Iyer", team: "KKR", matches: 40, runs: 1580, average: 39.5, strikeRate: 128.4, highest: 96, centuries: 0, fifties: 11 },
+            { name: "Rinku Singh", team: "KKR", matches: 32, runs: 1120, average: 35.0, strikeRate: 135.8, highest: 85, centuries: 0, fifties: 7 },
+            { name: "Andre Russell", team: "KKR", matches: 38, runs: 1250, average: 32.9, strikeRate: 162.3, highest: 88, centuries: 0, fifties: 6 },
+            { name: "Nitish Rana", team: "KKR", matches: 45, runs: 1650, average: 36.7, strikeRate: 130.2, highest: 87, centuries: 0, fifties: 9 },
+            { name: "Phil Salt", team: "KKR", matches: 12, runs: 480, average: 40.0, strikeRate: 144.0, highest: 79, centuries: 0, fifties: 2 },
+            { name: "Sunil Narine", team: "KKR", matches: 22, runs: 380, average: 19.0, strikeRate: 127.5, highest: 45, centuries: 0, fifties: 0 },
+
+            // DC (Delhi Capitals) - 6
+            { name: "Prithvi Shaw", team: "DC", matches: 38, runs: 1420, average: 37.4, strikeRate: 145.9, highest: 99, centuries: 0, fifties: 8 },
+            { name: "David Warner", team: "DC", matches: 44, runs: 1850, average: 42.0, strikeRate: 133.3, highest: 92, centuries: 0, fifties: 12 },
+            { name: "Manish Pandey", team: "DC", matches: 40, runs: 1320, average: 33.0, strikeRate: 131.6, highest: 85, centuries: 0, fifties: 7 },
+            { name: "Abishek Porel", team: "DC", matches: 18, runs: 620, average: 35.0, strikeRate: 141.8, highest: 78, centuries: 0, fifties: 3 },
+            { name: "Sarfaraz Khan", team: "DC", matches: 15, runs: 420, average: 28.0, strikeRate: 144.8, highest: 67, centuries: 0, fifties: 2 },
+            { name: "Anrich Nortje", team: "DC", matches: 25, runs: 180, average: 9.0, strikeRate: 110.0, highest: 28, centuries: 0, fifties: 0 },
+
+            // PBKS (Punjab Kings) - 6
+            { name: "Shikhar Dhawan", team: "PBKS", matches: 48, runs: 1920, average: 40.0, strikeRate: 132.4, highest: 92, centuries: 0, fifties: 14 },
+            { name: "Jonny Bairstow", team: "PBKS", matches: 32, runs: 1240, average: 38.8, strikeRate: 137.5, highest: 89, centuries: 0, fifties: 8 },
+            { name: "Mayank Agarwal", team: "PBKS", matches: 40, runs: 1580, average: 39.5, strikeRate: 128.9, highest: 89, centuries: 0, fifties: 9 },
+            { name: "Jitesh Sharma", team: "PBKS", matches: 20, runs: 720, average: 36.0, strikeRate: 150.3, highest: 82, centuries: 0, fifties: 3 },
+            { name: "Harpreet Brar", team: "PBKS", matches: 28, runs: 480, average: 24.0, strikeRate: 120.0, highest: 58, centuries: 0, fifties: 1 },
+            { name: "Sam Curran", team: "PBKS", matches: 30, runs: 920, average: 30.7, strikeRate: 148.2, highest: 88, centuries: 0, fifties: 4 },
+
+            // RR (Rajasthan Royals) - 6
+            { name: "Sanju Samson", team: "RR", matches: 50, runs: 1850, average: 37.0, strikeRate: 136.8, highest: 100, centuries: 1, fifties: 10 },
+            { name: "Yashasvi Jaiswal", team: "RR", matches: 22, runs: 850, average: 38.6, strikeRate: 140.2, highest: 98, centuries: 0, fifties: 5 },
+            { name: "Jos Buttler", team: "RR", matches: 28, runs: 1120, average: 40.0, strikeRate: 144.6, highest: 103, centuries: 1, fifties: 6 },
+            { name: "Devdutt Padikkal", team: "RR", matches: 35, runs: 1240, average: 35.4, strikeRate: 130.8, highest: 85, centuries: 0, fifties: 8 },
+            { name: "Riyan Parag", team: "RR", matches: 32, runs: 920, average: 28.8, strikeRate: 142.3, highest: 84, centuries: 0, fifties: 4 },
+            { name: "Trent Boult", team: "RR", matches: 20, runs: 150, average: 10.7, strikeRate: 96.8, highest: 31, centuries: 0, fifties: 0 },
+
+            // SRH (Sunrisers Hyderabad) - 6
+            { name: "Aiden Markram", team: "SRH", matches: 32, runs: 1280, average: 40.0, strikeRate: 135.4, highest: 92, centuries: 0, fifties: 8 },
+            { name: "Harry Brook", team: "SRH", matches: 12, runs: 520, average: 43.3, strikeRate: 148.6, highest: 96, centuries: 0, fifties: 3 },
+            { name: "Abhishek Sharma", team: "SRH", matches: 28, runs: 1050, average: 37.5, strikeRate: 141.8, highest: 99, centuries: 0, fifties: 6 },
+            { name: "Nicholas Pooran", team: "SRH", matches: 25, runs: 820, average: 32.8, strikeRate: 144.9, highest: 88, centuries: 0, fifties: 4 },
+            { name: "Rahul Tripathi", team: "SRH", matches: 38, runs: 1420, average: 37.4, strikeRate: 135.6, highest: 84, centuries: 0, fifties: 8 },
+            { name: "Glenn Phillips", team: "SRH", matches: 18, runs: 680, average: 38.9, strikeRate: 152.2, highest: 95, centuries: 0, fifties: 4 },
+
+            // LSG (Lucknow Super Giants) - 6
+            { name: "KL Rahul", team: "LSG", matches: 32, runs: 1380, average: 43.1, strikeRate: 132.4, highest: 97, centuries: 0, fifties: 10 },
+            { name: "Quinton de Kock", team: "LSG", matches: 28, runs: 1120, average: 40.0, strikeRate: 139.5, highest: 92, centuries: 0, fifties: 7 },
+            { name: "Marcus Stoinis", team: "LSG", matches: 24, runs: 920, average: 38.3, strikeRate: 145.3, highest: 87, centuries: 0, fifties: 5 },
+            { name: "Ayush Badoni", team: "LSG", matches: 18, runs: 650, average: 36.1, strikeRate: 144.7, highest: 76, centuries: 0, fifties: 3 },
+            { name: "Deepak Hooda", team: "LSG", matches: 22, runs: 820, average: 37.3, strikeRate: 133.8, highest: 84, centuries: 0, fifties: 4 },
+            { name: "Ravi Bishnoi", team: "LSG", matches: 20, runs: 280, average: 14.0, strikeRate: 108.5, highest: 38, centuries: 0, fifties: 0 },
+
+            // GT (Gujarat Titans) - 6
+            { name: "Shubman Gill", team: "GT", matches: 35, runs: 1520, average: 43.4, strikeRate: 128.3, highest: 96, centuries: 0, fifties: 11 },
+            { name: "Matthew Wade", team: "GT", matches: 28, runs: 1080, average: 38.6, strikeRate: 142.1, highest: 89, centuries: 0, fifties: 6 },
+            { name: "Wriddhiman Saha", team: "GT", matches: 32, runs: 1180, average: 36.9, strikeRate: 130.0, highest: 87, centuries: 0, fifties: 7 },
+            { name: "David Miller", team: "GT", matches: 30, runs: 1120, average: 37.3, strikeRate: 148.7, highest: 94, centuries: 0, fifties: 6 },
+            { name: "Rahul Tewatia", team: "GT", matches: 25, runs: 780, average: 31.2, strikeRate: 139.6, highest: 78, centuries: 0, fifties: 3 },
+            { name: "Abhinav Manohar", team: "GT", matches: 8, runs: 240, average: 30.0, strikeRate: 150.0, highest: 62, centuries: 0, fifties: 1 }
+        ];
+
+        let gameState = {
+            player1Deck: [],
+            player2Deck: [],
+            currentP1Card: null,
+            currentP2Card: null,
+            selectedStat: null,
+            gameActive: true
+        };
+
+        function initializeGame() {
+            // Shuffle cards
+            let shuffled = [...players].sort(() => Math.random() - 0.5);
+            gameState.player1Deck = shuffled.slice(0, 27);
+            gameState.player2Deck = shuffled.slice(27, 54);
+        }
+
+        function startGame() {
+            document.getElementById('menuScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            initializeGame();
+            drawCards();
+        }
+
+        function drawCards() {
+            if (gameState.player1Deck.length === 0 || gameState.player2Deck.length === 0) {
+                endGame();
+                return;
+            }
+
+            gameState.currentP1Card = gameState.player1Deck.shift();
+            gameState.currentP2Card = gameState.player2Deck.shift();
+
+            displayP1Card();
+            displayP2Card();
+            updateCardCount();
+            document.getElementById('statSelectionContainer').classList.remove('hidden');
+            document.getElementById('roundResultContainer').classList.add('hidden');
+        }
+
+        function displayP1Card() {
+            const card = gameState.currentP1Card;
+            document.getElementById('p1PlayerName').textContent = card.name;
+            document.getElementById('p1TeamName').textContent = card.team;
+            document.getElementById('p1Team').textContent = card.team;
+            document.getElementById('p1Matches').textContent = card.matches;
+            document.getElementById('p1Runs').textContent = card.runs;
+            document.getElementById('p1Average').textContent = card.average.toFixed(1);
+            document.getElementById('p1SR').textContent = card.strikeRate.toFixed(1);
+            document.getElementById('p1HS').textContent = card.highest;
+            document.getElementById('p1Centuries').textContent = card.centuries;
+            document.getElementById('p1Fifties').textContent = card.fifties;
+
+            // Update call buttons
+            document.getElementById('callMatches').textContent = card.matches;
+            document.getElementById('callRuns').textContent = card.runs;
+            document.getElementById('callAverage').textContent = card.average.toFixed(1);
+            document.getElementById('callStrikeRate').textContent = card.strikeRate.toFixed(1);
+            document.getElementById('callHighest').textContent = card.highest;
+            document.getElementById('callCenturies').textContent = card.centuries;
+            document.getElementById('callFifties').textContent = card.fifties;
+        }
+
+        function displayP2Card() {
+            const card = gameState.currentP2Card;
+            document.getElementById('p2TeamName').textContent = card.team;
+            document.getElementById('p2PlayerName').textContent = card.name;
+            document.getElementById('p2Matches').textContent = card.matches;
+            document.getElementById('p2Runs').textContent = card.runs;
+            document.getElementById('p2Average').textContent = card.average.toFixed(1);
+            document.getElementById('p2SR').textContent = card.strikeRate.toFixed(1);
+            document.getElementById('p2HS').textContent = card.highest;
+            document.getElementById('p2Centuries').textContent = card.centuries;
+            document.getElementById('p2Fifties').textContent = card.fifties;
+        }
+
+        function displayP2CardHidden() {
+            document.getElementById('p2PlayerName').textContent = '?';
+            document.getElementById('p2Matches').textContent = '?';
+            document.getElementById('p2Runs').textContent = '?';
+            document.getElementById('p2Average').textContent = '?';
+            document.getElementById('p2SR').textContent = '?';
+            document.getElementById('p2HS').textContent = '?';
+            document.getElementById('p2Centuries').textContent = '?';
+            document.getElementById('p2Fifties').textContent = '?';
+        }
+
+        function playRound(stat) {
+            gameState.selectedStat = stat;
+            const statLabels = {
+                'matches': 'Matches',
+                'runs': 'Total Runs',
+                'average': 'Batting Average',
+                'strikeRate': 'Strike Rate',
+                'highest': 'Highest Score',
+                'centuries': 'Centuries',
+                'fifties': 'Fifties'
+            };
+
+            const p1Value = gameState.currentP1Card[stat];
+            const p2Value = gameState.currentP2Card[stat];
+
+            document.getElementById('statSelectionContainer').classList.add('hidden');
+            document.getElementById('roundResultContainer').classList.remove('hidden');
+
+            // Reveal P2 card
+            displayP2Card();
+
+            let winner = '';
+            let message = '';
+
+            if (p1Value > p2Value) {
+                winner = 'p1';
+                gameState.player1Deck.push(gameState.currentP1Card, gameState.currentP2Card);
+                message = `🎉 Player 1 Wins! ${gameState.currentP1Card.name}'s ${statLabels[stat]} (${getStatValue(p1Value)}) beats ${gameState.currentP2Card.name}'s (${getStatValue(p2Value)})`;
+            } else if (p2Value > p1Value) {
+                winner = 'p2';
+                gameState.player2Deck.push(gameState.currentP1Card, gameState.currentP2Card);
+                message = `✨ Player 2 Wins! ${gameState.currentP2Card.name}'s ${statLabels[stat]} (${getStatValue(p2Value)}) beats ${gameState.currentP1Card.name}'s (${getStatValue(p1Value)})`;
+            } else {
+                winner = 'tie';
+                gameState.player1Deck.push(gameState.currentP1Card);
+                gameState.player2Deck.push(gameState.currentP2Card);
+                message = `🔄 It's a Tie! Both ${statLabels[stat]} are ${getStatValue(p1Value)}`;
+            }
+
+            document.getElementById('roundMessage').textContent = message;
+            document.getElementById('roundStats').innerHTML = `
+                <div><strong>${gameState.currentP1Card.name}:</strong> ${getStatValue(p1Value)}</div>
+                <div><strong>${gameState.currentP2Card.name}:</strong> ${getStatValue(p2Value)}</div>
+            `;
+        }
+
+        function getStatValue(value) {
+            return typeof value === 'number' && value % 1 !== 0 ? value.toFixed(1) : value;
+        }
+
+        function nextRound() {
+            displayP2CardHidden();
+            drawCards();
+        }
+
+        function updateCardCount() {
+            document.getElementById('p1Cards').textContent = gameState.player1Deck.length + 1;
+            document.getElementById('p2Cards').textContent = gameState.player2Deck.length + 1;
+        }
+
+        function endGame() {
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('gameOverScreen').classList.remove('hidden');
+
+            let winner = '';
+            if (gameState.player1Deck.length > 0) {
+                document.getElementById('gameOverTitle').textContent = '🏆 Player 1 Wins!';
+                document.getElementById('gameOverMessage').textContent = 'Congratulations! You collected all 54 cards!';
+            } else {
+                document.getElementById('gameOverTitle').textContent = '🤖 Player 2 Wins!';
+                document.getElementById('gameOverMessage').textContent = 'The AI opponent has collected all 54 cards. Better luck next time!';
+            }
+        }
+    </script>
+</body>
+</html>
